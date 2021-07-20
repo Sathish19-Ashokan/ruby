@@ -1,28 +1,44 @@
 require 'csv'
 
-class Csv
-    def write(header, data)
-        CSV.open('file_management.csv','wb') do |csv|
-            csv << header
+class Input
+    def initialize(header, data)
+        @header = header
+        @data = data
+    end
 
-            data.each do |column|
+    def getInput
+        CSV.open('file_management.csv','wb') do |csv|
+            csv << @header
+
+            @data.each do |column|
                 csv << column
             end
         end
     end
+end
 
-    def append(data)
+class Add
+    def initialize(data)
+        @data = data
+    end
+
+    def addInput
         CSV.open('file_management.csv','a') do |csv|
 
-            data.each do |column|
+            @data.each do |column|
                 csv << column
             end
         end
     end
+end
 
+class Display
     def read
-        CSV.foreach('file_management.csv') do |row|
-            puts row.inspect
+        CSV.open('file_management.csv', 'r') do |csv|
+            puts csv
+            csv.each do |column|
+                puts column.inspect
+            end
         end
     end
 end
@@ -30,16 +46,24 @@ end
 #Header Data
 headers = ['Name', 'Age', 'City']
 
-# getting command line value
-argument = ARGV
-# first value as method
-method = argument[0]
-# other values as data
-csv_data = [argument.drop(1)]
-# csv object
-csv = Csv.new
+# Methods
 
-#Methods
-csv.write(headers, csv_data) if method == 'write'
-csv.append(csv_data) if method == 'append'
-csv.read if method == 'read'
+if ARGV[0] == 'write'
+    puts "I am IN"
+    csv_data = [ARGV.drop(1)]
+    csv = Input.new(headers, csv_data)
+    csv.getInput
+end
+
+if ARGV[0] == 'add'
+    puts "Lets Add"
+    csv_data = [ARGV.drop(1)]
+    csv = Add.new(csv_data)
+    csv.addInput
+end
+
+if ARGV[0] == 'read'
+    puts "I am Reading..."
+    csv = Display.new
+    csv.read
+end
